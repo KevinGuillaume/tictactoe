@@ -3,7 +3,6 @@
 
 board = [ ' ' for x in range(10)]
 
-
 def placeLetter(letter,pos):
     board[pos] = letter
 
@@ -25,31 +24,95 @@ def printBoard(board):
     print('   |   |')
 
 def isWinner(brd, let):
-    #Finding all ways for a winner to be possible 
-    #First 3 rows horizontal,next 3 vetical, last two diagonal
-    return (brd[7]==let and bo[8]== le and bo[9]==le) or
-    (bo[4] == let and bo[5] == let and bo[6]==let) or
-    (bo[1] == let and bo[2] == let and bo[3]==let) or
-    (brd[1]==let and bo[4]== le and bo[7]==le) or
-    (bo[2] == let and bo[5] == let and bo[8]==let) or
-    (bo[3] == let and bo[6] == let and bo[9]==let) or
-    (brd[1]==let and bo[5]== le and bo[9]==le) or
-    (bo[3] == let and bo[5] == let and bo[7]==let) 
+    return (brd[7]==let and brd[8]== let and brd[9]==let) or (brd[4] == let and brd[5] == let and brd[6]==let) or (brd[1] == let and brd[2] == let and brd[3]==let) or (brd[1] == let and brd[4] == let and brd[7]==let) or (brd[2] == let and brd[5] == let and brd[8]==let) or (brd[3] == let and brd[6] == let and brd[9]==let) or (brd[1] == let and brd[5] == let and brd[9]==let) or (brd[3] == let and brd[5] == let and brd[7]==let) 
     
 
 def playerMove():
-    pass
-
+    run = True
+    while run:
+        move = input("Pick a position for your \'X\' (1-9):")
+        try:
+            move = int(move)
+            if move > 0 and move < 10:
+                if openSpace(move):
+                    run = False
+                    placeLetter('X', move)
+                else:
+                    print("Sorry, this space is taken!")
+            else:
+                print("Please enter a number within the range!")
+        except:
+            print("Please type a number!")
 def compMove():
-    pass
+    possibleMoves = [x for x, letter in enumerate(board) if letter == " " and x != 0]
+    move = 0
 
-def selectRandom(board):
-    pass
+    for let in ['O','X']:
+        for i in possibleMoves:
+            boardCopy = board[:]
+            boardCopy[i] = let
+            if isWinner(boardCopy,let):
+                move = i
+                return move
 
+    cornersOpen = []
+    for i in possibleMoves:
+        if i in [1,3,7,9]:
+            cornersOpen.append(i)
+    if len(cornersOpen) > 0:
+        move = selectRandom(cornersOpen)
+        return move
+
+    if 5 in possibleMoves:
+        move = 5
+        return move
+
+    edgesOpen = []
+    for i in possibleMoves:
+        if i in [2,4,6,8]:
+            edgesOpen.append(i)
+    if len(edgesOpen) > 0:
+        move = selectRandom(edgesOpen)
+
+    return move
+
+def selectRandom(li):
+    import random
+    ln = len(li)
+    r = random.randrange(0,ln)
+    return li[r]
+    
 def isBoardFull(board):
-    pass
+    if board.count(' ') > 1:
+        return False
+    else:
+        return True
 
 def main():
-    pass
+    print("TIME TO PLAY TIC TAC TOE!")
+    printBoard(board)
 
- main()
+    while not(isBoardFull(board)):
+        if not(isWinner(board, 'O')):
+            playerMove()
+            printBoard(board)
+        else:
+            print("Sorry, O\'s wom this time!")
+            break
+
+        if not(isWinner(board, 'X')):
+            move = compMove()
+            if move == 0:
+                print("Tie game")
+            else:
+                placeLetter('O',move)
+                print('Computer placed an \'O\' in position', move , ':')
+                printBoard(board)
+        else:
+            print("You won, nice!")
+            break
+
+    if isBoardFull(board):
+        print("Tie Game!")
+
+main()
